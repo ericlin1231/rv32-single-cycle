@@ -1,26 +1,32 @@
 package riscv.core
 
 import chisel3._
+import _root_.circt.stage.ChiselStage
+
 import riscv.Parameters
+
+import peripheral.InstructionROM
 
 object ProgramCounter {
   val EntryAddress = Parameters.EntryAddress
 }
 
-class Fetch extends Module {
+class Fetch(filename: String) extends Module {
   val io = IO(new Bundle {
     val jump_flag_id          = Input(Bool())
     val jump_address_id       = Input(UInt(Parameters.AddrWidth))
-    val instruction_read_data = Input(UInt(Parameters.DataWidth))
     val instruction_valid     = Input(Bool())
 
     val instruction_address = Output(UInt(Parameters.AddrWidth))
     val instruction         = Output(UInt(Parameters.InstructionWidth))
   })
-  val pc = RegInit(ProgramCounter.EntryAddress)
+  val InstructionROM      = Module(new InstructionROM(filename))
+  val PC                  = RegInit(ProgramCounter.EntryAddress)
+  val instruction_address = PC >> 2
 
   when(io.instruction_valid) {
-    io.instruction := io.instruction_read_data
+    InstructionROM.io.address := instruction_address.U
+    io.instruction := InstructionROM.io.instruction
     when(io.jump_flag_id === true.B) {
       pc := io.jump_address_id
     }.otherwise {
@@ -33,3 +39,14 @@ class Fetch extends Module {
   io.instruction_address := pc
 }
 
+object Fetch extends App {
+  ChiselStage.emitSystemVerilogFile(
+    new Fetch,
+    args = Array("--target-dir", "build/core"),
+    firtoolOpts = Array(
+      "--disable-all-randomization",
+      "--lowering-options=disallowLocalVariables",
+      "--strip-debug-info"
+    )
+  )
+}

@@ -1,9 +1,15 @@
-.PHONY: sv test clean
+.PHONY: run test clean
 
 PROJECT = cpu
 
 test:
-	mill $(PROJECT).test
+	@- sbt test
+	@rm -rf target project
+run:
+	@mkdir -p build/core
+	@mkdir -p build/peripheral
+	@sbt run
+	@rm -rf target project
 
 clean:
-	@rm -rf out
+	@rm -rf build target project

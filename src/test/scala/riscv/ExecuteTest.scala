@@ -1,15 +1,15 @@
 package riscv
 
 import chisel3._
-import chisel3.simulator.EphemeralSimulator._
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import chiseltest._
+import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 
 import riscv.core.Execute
 
-class ExecuteTest extends AnyFreeSpec with Matchers {
-  "execute correctly" in {
-    simulate(new Execute) { c =>
+class ExecuteTest extends AnyFlatSpec with ChiselScalatestTester {
+  "execute correctly" should "pass" in {
+    test(new Execute) { c =>
       c.io.instruction.poke(0x001101b3L.U)
 
       var x = 0

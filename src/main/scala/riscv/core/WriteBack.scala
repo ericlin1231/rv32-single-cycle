@@ -2,6 +2,8 @@ package riscv.core
 
 import chisel3._
 import chisel3.util._
+import _root_.circt.stage.ChiselStage
+
 import riscv.Parameters
 
 class WriteBack extends Module {
@@ -18,5 +20,17 @@ class WriteBack extends Module {
       RegWriteSource.NextInstructionAddress -> (io.instruction_address + 4.U)
     )
   );
+}
+
+object WriteBack extends App {
+  ChiselStage.emitSystemVerilogFile(
+    new WriteBack,
+    args = Array("--target-dir", "build/core"),
+    firtoolOpts = Array(
+      "--disable-all-randomization",
+      "--lowering-options=disallowLocalVariables",
+      "--strip-debug-info"
+    )
+  )
 }
 

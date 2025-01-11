@@ -1,17 +1,17 @@
 package riscv
 
 import chisel3._
-import chisel3.simulator.EphemeralSimulator._
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import chiseltest._
+import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 
 import core.Decode
 import core.ALUOp1Source
 import core.ALUOp2Source
 
-class DecodeTest extends AnyFreeSpec with Matchers {
-  "produce correct control signal" in {
-    simulate(new Decode) { c =>
+class DecodeTest extends AnyFlatSpec with ChiselScalatestTester {
+  "produce correct control signal" should "pass" in {
+    test(new Decode) { c =>
       c.io.instruction.poke(0x00a02223L.U) // S-type
       c.io.ex_aluop1_source.expect(ALUOp1Source.Register)
       c.io.ex_aluop2_source.expect(ALUOp2Source.Immediate)

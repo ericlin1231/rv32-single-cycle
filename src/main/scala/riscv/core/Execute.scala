@@ -3,6 +3,7 @@ package riscv.core
 import chisel3._
 import chisel3.util.Cat
 import chisel3.util.MuxLookup
+import _root_.circt.stage.ChiselStage
 
 import riscv.Parameters
 
@@ -34,11 +35,9 @@ class Execute extends Module {
   alu_ctrl.io.funct3 := funct3
   alu_ctrl.io.funct7 := funct7
 
-  // lab3(Execute) begin
   alu.io.func := alu_ctrl.io.alu_funct
   alu.io.op1  := io.reg1_data
   alu.io.op2  := io.reg2_data
-  // lab3(Execute) end
 
   io.mem_alu_result := alu.io.result
   io.if_jump_flag := opcode === Instructions.jal ||
@@ -56,3 +55,14 @@ class Execute extends Module {
   io.if_jump_address := io.immediate + Mux(opcode === Instructions.jalr, io.reg1_data, io.instruction_address)
 }
 
+object Execute extends App {
+  ChiselStage.emitSystemVerilogFile(
+    new Execute,
+    args = Array("--target-dir", "build/core"),
+    firtoolOpts = Array(
+      "--disable-all-randomization",
+      "--lowering-options=disallowLocalVariables",
+      "--strip-debug-info"
+    )
+  )
+}

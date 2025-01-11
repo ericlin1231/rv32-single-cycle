@@ -2,6 +2,7 @@ package riscv.core
 
 import chisel3._
 import chisel3.util._
+import _root_.circt.stage.ChiselStage
 
 import riscv.Parameters
 
@@ -48,4 +49,16 @@ class ALU extends Module {
       io.result := io.op1 < io.op2
     }
   }
+}
+
+object ALU extends App {
+  ChiselStage.emitSystemVerilogFile(
+    new ALU,
+    args = Array("--target-dir", "build/core"),
+    firtoolOpts = Array(
+      "--disable-all-randomization",
+      "--lowering-options=disallowLocalVariables",
+      "--strip-debug-info"
+    )
+  )
 }

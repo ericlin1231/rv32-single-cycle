@@ -1,6 +1,7 @@
 package riscv.core
 
 import chisel3._
+import _root_.circt.stage.ChiselStage
 
 import riscv.Parameters
 
@@ -53,3 +54,14 @@ class RegisterFile extends Module {
   )
 }
 
+object RegisterFile extends App {
+  ChiselStage.emitSystemVerilogFile(
+    new RegisterFile,
+    args = Array("--target-dir", "build/core"),
+    firtoolOpts = Array(
+      "--disable-all-randomization",
+      "--lowering-options=disallowLocalVariables",
+      "--strip-debug-info"
+    )
+  )
+}

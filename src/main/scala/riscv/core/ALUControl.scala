@@ -2,6 +2,7 @@ package riscv.core
 
 import chisel3._
 import chisel3.util._
+import _root_.circt.stage.ChiselStage
 
 class ALUControl extends Module {
   val io = IO(new Bundle {
@@ -65,5 +66,17 @@ class ALUControl extends Module {
       io.alu_funct := ALUFunctions.add
     }
   }
+}
+
+object ALUControl extends App {
+  ChiselStage.emitSystemVerilogFile(
+    new ALUControl,
+    args = Array("--target-dir", "build/core"),
+    firtoolOpts = Array(
+      "--disable-all-randomization",
+      "--lowering-options=disallowLocalVariables",
+      "--strip-debug-info"
+    )
+  )
 }
 

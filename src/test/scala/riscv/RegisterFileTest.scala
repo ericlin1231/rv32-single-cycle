@@ -1,16 +1,15 @@
 package riscv
 
 import chisel3._
-import chisel3.simulator.EphemeralSimulator._
-
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import chiseltest._
+import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 
 import core.RegisterFile
 
-class RegisterFileTest extends AnyFreeSpec with Matchers {
-  "read the written content" in {
-    simulate(new RegisterFile) { c =>
+class RegisterFileTest extends AnyFlatSpec with ChiselScalatestTester {
+  "read the written content" should "pass" in {
+    test(new RegisterFile) { c =>
       c.io.write_enable.poke(true.B)
       c.io.write_address.poke(1.U)
       c.io.write_data.poke(0xdeadbeefL.U)
@@ -20,8 +19,8 @@ class RegisterFileTest extends AnyFreeSpec with Matchers {
     }
   }
 
-  "x0 always be zero" in {
-    simulate(new RegisterFile) { c =>
+  "x0 always be zero" should "pass" in {
+    test(new RegisterFile) { c =>
       c.io.write_enable.poke(true.B)
       c.io.write_address.poke(0.U)
       c.io.write_data.poke(0xdeadbeefL.U)
@@ -31,8 +30,8 @@ class RegisterFileTest extends AnyFreeSpec with Matchers {
     }
   }
 
-  "read the writing content" in {
-    simulate(new RegisterFile) { c =>
+  "read the writing content" should "pass" in {
+    test(new RegisterFile) { c =>
       c.io.read_address1.poke(2.U)
       c.io.read_data1.expect(0.U)
       c.io.write_enable.poke(true.B)

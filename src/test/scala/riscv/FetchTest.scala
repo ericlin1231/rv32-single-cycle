@@ -1,18 +1,17 @@
 package riscv
 
 import chisel3._
-import chisel3.simulator.EphemeralSimulator._
-
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import chiseltest._
+import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 
 import scala.util.Random
 
 import core.Fetch
 
-class FetchTest extends AnyFreeSpec with Matchers {
-  "fetch instruction" in {
-    simulate(new Fetch) { c =>
+class FetchTest extends AnyFlatSpec with ChiselScalatestTester {
+  "fetch instruction" should "pass" in {
+    test(new Fetch) { c =>
       val entry = 0x0
       var pre   = 0x0
       var cur   = 0x0

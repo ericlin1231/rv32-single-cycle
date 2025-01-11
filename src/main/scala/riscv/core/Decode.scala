@@ -4,6 +4,7 @@ import scala.collection.immutable.ArraySeq
 
 import chisel3._
 import chisel3.util._
+import _root_.circt.stage.ChiselStage
 
 import riscv.Parameters
 
@@ -101,9 +102,25 @@ class Decode extends Module {
     )
   )
 
-  io.reg_write_enable := (opcode === InstructionTypes.RM) || (opcode === InstructionTypes.I) ||
-    (opcode === InstructionTypes.L) || (opcode === Instructions.auipc) || (opcode === Instructions.lui) ||
-    (opcode === Instructions.jal) || (opcode === Instructions.jalr)
+  io.reg_write_enable := ((opcode === InstructionTypes.RM)
+                          || (opcode === InstructionTypes.I)
+                          || (opcode === InstructionTypes.L)
+                          || (opcode === Instructions.auipc)
+                          || (opcode === Instructions.lui)
+                          || (opcode === Instructions.jal)
+                          || (opcode === Instructions.jalr))
+
   io.reg_write_address := rd
 }
 
+object Decode extends App {
+  ChiselStage.emitSystemVerilogFile(
+    new Decode,
+    args = Array("--target-dir", "build/core"),
+    firtoolOpts = Array(
+      "--disable-all-randomization",
+      "--lowering-options=disallowLocalVariables",
+      "--strip-debug-info"
+    )
+  )
+}
