@@ -14,8 +14,9 @@ BINFLAG  = -O binary -j .text -j .data
 HEXFLAG  = -v -e '/4 "%08x\n"'
 
 HEXS = \
-	fibonacci.hex \
-	function.hex  \
+	fibonacci.hex     \
+	function.hex      \
+	recursive_sum.hex \
 	sum.hex
 
 init.o: init.S

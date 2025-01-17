@@ -7,10 +7,11 @@ import org.scalatest.flatspec.AnyFlatSpec
 
 class FibonacciTest extends AnyFlatSpec with ChiselScalatestTester {
   "recursively calculate Fibonacci(10)" should "pass" in {
-    test(new CPU("csrc/fibonacci.hex")) { c =>
+    test(new CPU("csrc/fibonacci.hex")).withAnnotations(Seq(WriteVcdAnnotation)) { c =>
       c.io.instruction_valid.poke(true.B)
-      for (_ <- 0 to 600) {
+      for (i <- 0 to 4000) {
         c.clock.step()
+        c.io.mem_debug_read_address.poke(i.U)
       }
       
       c.io.mem_debug_read_address.poke(4.U)
@@ -19,7 +20,7 @@ class FibonacciTest extends AnyFlatSpec with ChiselScalatestTester {
     }
   }
 
-  "Non recursively Fibonacci(10) in assembly version" should "pass" in {
+  "non recursively Fibonacci(10) in assembly version" should "pass" in {
     test(new CPU("asm/fibonacci.hex")) { c =>
       c.io.instruction_valid.poke(true.B)
       for(_ <- 0 to 100) {
@@ -49,6 +50,19 @@ class CountTest extends AnyFlatSpec with ChiselScalatestTester {
 }
 
 class SumTest extends AnyFlatSpec with ChiselScalatestTester {
+  "recursive sum 1 to 3, store result to address 4" should "pass" in {
+    test(new CPU("csrc/recursive_sum.hex")) { c =>
+      c.io.instruction_valid.poke(true.B)
+      for(_ <- 0 to 200) {
+        c.clock.step()
+      }
+
+      c.io.mem_debug_read_address.poke(4.U)
+      c.clock.step()
+      c.io.mem_debug_read_data.expect(6.U)
+    }
+  }
+
   "sum 0 to 10, store result to address 4" should "pass" in {
     test(new CPU("csrc/sum.hex")) { c =>
       c.io.instruction_valid.poke(true.B)

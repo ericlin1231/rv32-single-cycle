@@ -1,0 +1,14 @@
+#Successful Tests
+#Fri Jan 17 21:26:42 CST 2025
+peripheral.InstructionROMTest=1737120390527
+core.FibonacciTest=1737120402027
+peripheral.DataRAMTest=1737120390901
+core.CheckSP=1737120390704
+core.ExecuteTest=1737120390618
+core.RegisterFileTest=1737120390813
+core.StoreLoadTest=1737120390756
+core.FunctionCallTest=1737120391121
+core.FetchTest=1737120390573
+core.CountTest=1737120390913
+core.SumTest=1737120391689
+core.DecodeTest=1737120390485

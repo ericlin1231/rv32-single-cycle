@@ -1,0 +1,1 @@
+["core.FetchTest","core.DecodeTest","peripheral.InstructionROMTest","core.CheckSP","core.StoreLoadTest","core.SumTest","core.CountTest","core.FunctionCallTest","core.RegisterFileTest","peripheral.DataRAMTest","core.FibonacciTest","core.ExecuteTest"]
