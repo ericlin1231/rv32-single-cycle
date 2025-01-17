@@ -1,37 +1,34 @@
 package peripheral
 
 import chisel3._
+import chisel3.experimental.annotate
+import chisel3.experimental.ChiselAnnotation
 import chisel3.util.experimental.loadMemoryFromFileInline
+import firrtl.transforms.DontTouchAnnotation
 
-import _root_.circt.stage.ChiselStage
-
-import riscv.Parameters
+import bundle.InstructionROMBundle
+import bundle.InstructionROMDebugBundle
+import parameters.System
 
 class InstructionROM(filename: String) extends Module {
   val io = IO(new Bundle {
-    val address     = Input(UInt(Parameters.AddrWidth))
-    val instruction = Output(UInt(Parameters.InstructionWidth))
+    val IROMPort  = new InstructionROMBundle
+    val DebugPort = new InstructionROMDebugBundle
   })
 
-  val mem = SyncReadMem(1024, UInt(Parameters.InstructionWidth))
+  val mem = Mem(System.InstructionMemorySizeInBytes, UInt(System.InstructionWidth)).suggestName("mem")
+  annotate(new ChiselAnnotation {
+    def toFirrtl = DontTouchAnnotation(mem.toTarget)
+  })
   loadMemoryFromFileInline(
     mem,
     f"./src/main/resources/${filename}",
     firrtl.annotations.MemoryLoadFileType.Hex
   )
 
-  io.instruction := mem.read(io.address)
-}
+  io.IROMPort.instruction := mem.read(io.IROMPort.address)
 
-
-object InstructionROMsv extends App {
-  ChiselStage.emitSystemVerilogFile(
-    new InstructionROM("count.hex"),
-    args = Array("--target-dir", "build/peripheral"),
-    firtoolOpts = Array(
-      "--disable-all-randomization",
-      "--lowering-options=disallowLocalVariables",
-      "--strip-debug-info"
-    )
-  )
+  /* InstructionROM Debug */
+  io.DebugPort.instructionROM_debug_read_instruction := 
+    mem.read(io.DebugPort.instructionROM_debug_read_address)
 }

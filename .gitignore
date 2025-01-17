@@ -1,3 +1,4 @@
 obj_dir
 out
 *.sv
+.DS_Store

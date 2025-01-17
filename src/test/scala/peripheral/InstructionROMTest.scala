@@ -7,12 +7,11 @@ import org.scalatest.flatspec.AnyFlatSpec
 
 class InstructionROMTest extends AnyFlatSpec with ChiselScalatestTester {
   "show instruction ROM content" should "pass" in {
-    test(new InstructionROM("count.hex")) { c =>
+    test(new InstructionROM("asm/count.hex")) { c =>
       for(i <- 0 to 50) {
-        c.io.address.poke(i.U)
+        c.io.IROMPort.address.poke(i.U)
         c.clock.step()
-        val instruction = c.io.instruction.peek().litValue
-        println(f"Address ${i << 2}: ${instruction}%08x")
+        val instruction = c.io.IROMPort.instruction.peek().litValue
       }
     }
   }

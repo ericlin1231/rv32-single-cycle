@@ -12,4 +12,4 @@ run:
 	@rm -rf target project
 
 clean:
-	@rm -rf build target project
+	@rm -rf build target project test_run_dir

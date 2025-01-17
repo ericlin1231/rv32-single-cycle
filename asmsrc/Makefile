@@ -1,7 +1,7 @@
 .PHONY: hex elf clean
 
-CROSS_COMPILATION ?= riscv64-unknown-linux-gnu
-HEX_DIR = ../src/main/resources
+CROSS_COMPILATION ?= riscv64-unknown-elf
+HEX_DIR = ../src/main/resources/asm
 
 AS   = $(CROSS_COMPILATION)-as
 LD   = $(CROSS_COMPILATION)-ld
@@ -16,7 +16,11 @@ DUMPFLAG = -d -j .text -j .data
 HEXFLAG  = -v -e '/4 "%08x\n"'
 
 ASM = \
-	  count.S
+	count.S      \
+	store_load.S \
+	sp.S         \
+	fibonacci.S  \
+	branch.S
 
 %.o: %.S
 	$(AS) $(ASFLAG) -o $@ $<

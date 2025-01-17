@@ -14,6 +14,6 @@ continue:
     j loop                # Repeat the loop
 
 end_loop:
-    li t2, 1000           # Load immediate value 1000 into register t2
+    li t2, 4              # Load immediate value 4 into register t2
     sw t0, 0(t2)          # Store word from t0 into memory address contained in t2
     nop
