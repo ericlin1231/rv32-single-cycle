@@ -33,6 +33,6 @@ class Fetch extends Module {
   io.instruction_address := PC
 
   /* Fetch Debug */
-  io.DebugPort.fetch_debug_read_pc := PC
-  io.DebugPort.fetch_debug_read_instruction := io.IROMPort.instruction
+  io.DebugPort.debug_read_pc := PC
+  io.DebugPort.debug_read_instruction := io.IROMPort.instruction
 }

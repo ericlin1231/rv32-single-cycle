@@ -29,6 +29,5 @@ class InstructionROM(filename: String) extends Module {
   io.IROMPort.instruction := mem.read(io.IROMPort.address)
 
   /* InstructionROM Debug */
-  io.DebugPort.instructionROM_debug_read_instruction := 
-    mem.read(io.DebugPort.instructionROM_debug_read_address)
+  io.DebugPort.debug_read_instruction := mem.read(io.DebugPort.debug_read_address)
 }

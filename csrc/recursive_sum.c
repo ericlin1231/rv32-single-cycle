@@ -6,6 +6,6 @@ static int recursive_sum(int n)
 
 int main()
 {
-    *((volatile int *) (4)) = recursive_sum(3);
+    *((volatile int *) (4)) = recursive_sum(10);
     return 0;
 }

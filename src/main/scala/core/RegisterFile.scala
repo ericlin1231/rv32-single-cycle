@@ -40,9 +40,9 @@ class RegisterFile extends Module {
     registers(io.read_address2)
   )
 
-  io.DebugPort.register_debug_read_data := Mux(
-    io.DebugPort.register_debug_read_address === 0.U,
+  io.DebugPort.debug_read_data := Mux(
+    io.DebugPort.debug_read_address === 0.U,
     0.U,
-    registers(io.DebugPort.register_debug_read_address)
+    registers(io.DebugPort.debug_read_address)
   )
 }

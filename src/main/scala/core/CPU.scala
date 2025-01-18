@@ -2,10 +2,11 @@ package core
 
 import chisel3._
 import chisel3.util.Cat
+import _root_.circt.stage.ChiselStage
 
-import parameters.System
 import bundle.CPUBundle
-import peripheral.DataRAM
+import parameters.System
+import peripheral.Memory
 import peripheral.InstructionROM
 
 class CPU(filename: String) extends Module {
@@ -15,12 +16,15 @@ class CPU(filename: String) extends Module {
   val IF   = Module(new Fetch)
   val ID   = Module(new Decode)
   val EX   = Module(new Execute)
-  val MEM  = Module(new DataRAM)
+  val MEM  = Module(new Memory)
   val WB   = Module(new WriteBack)
 
-  /* Initialization */
-  IROM.io.DebugPort.instructionROM_debug_read_address := DontCare
-  IROM.io.DebugPort.instructionROM_debug_read_instruction := DontCare
+
+  /* Debug */
+  io.IROMDebug <> IROM.io.DebugPort
+  io.REGSDebug <> REGS.io.DebugPort
+  io.IFDebug   <> IF.io.DebugPort
+  io.MEMDebug  <> MEM.io.DebugPort
 
   /* Instruction Fetch */
   IF.io.jump_address_id      := EX.io.if_jump_address
@@ -29,13 +33,8 @@ class CPU(filename: String) extends Module {
   IF.io.IROMPort.instruction := IROM.io.IROMPort.instruction
   IROM.io.IROMPort.address   := IF.io.IROMPort.address
 
-  /* Instruction Fetch Debug */
-  io.fetch_debug_read_pc := IF.io.DebugPort.fetch_debug_read_pc
-  io.fetch_debug_read_instruction := IF.io.DebugPort.fetch_debug_read_instruction
-
-  /* InstructionROM Debug */
-  IROM.io.DebugPort.instructionROM_debug_read_address := io.instructionROM_debug_read_address
-  io.instructionROM_debug_read_instruction := IROM.io.DebugPort.instructionROM_debug_read_instruction
+  /* Instruction Decoder */
+  ID.io.instruction := IF.io.instruction
 
   /* Register File */
   REGS.io.write_enable  := ID.io.reg_write_enable
@@ -43,13 +42,6 @@ class CPU(filename: String) extends Module {
   REGS.io.write_data    := WB.io.regs_write_data
   REGS.io.read_address1 := ID.io.regs_reg1_read_address
   REGS.io.read_address2 := ID.io.regs_reg2_read_address
-
-  /* Register File Debug */
-  REGS.io.DebugPort.register_debug_read_address := io.register_debug_read_address
-  io.register_debug_read_data                   := REGS.io.DebugPort.register_debug_read_data
-
-  /* Instruction Decoder */
-  ID.io.instruction := IF.io.instruction
 
   /* Execution */
   EX.io.instruction         := IF.io.instruction
@@ -61,19 +53,27 @@ class CPU(filename: String) extends Module {
   EX.io.aluop2_source       := ID.io.ex_aluop2_source
 
   /* Memory */
-  MEM.io.bundle.address := EX.io.mem_alu_result
-  MEM.io.bundle.wEn     := ID.io.memory_write_enable
-  MEM.io.bundle.wData   := REGS.io.read_data2
-  MEM.io.bundle.rEn     := ID.io.memory_read_enable
-  MEM.io.funct3         := IF.io.instruction(14, 12)
-
-  /* Memory Debug */
-  MEM.io.bundle.mem_debug_read_address := io.mem_debug_read_address
-  io.mem_debug_read_data               := MEM.io.bundle.mem_debug_read_data
+  MEM.io.MEMPort.address := EX.io.mem_alu_result
+  MEM.io.MEMPort.wEn     := ID.io.memory_write_enable
+  MEM.io.MEMPort.wData   := REGS.io.read_data2
+  MEM.io.MEMPort.rEn     := ID.io.memory_read_enable
+  MEM.io.funct3          := IF.io.instruction(14, 12)
 
   /* Write Back */
   WB.io.instruction_address := IF.io.instruction_address
   WB.io.alu_result          := EX.io.mem_alu_result
-  WB.io.memory_read_data    := MEM.io.bundle.rData
+  WB.io.memory_read_data    := MEM.io.MEMPort.rData
   WB.io.regs_write_source   := ID.io.wb_reg_write_source
+}
+
+object CPU extends App {
+  ChiselStage.emitSystemVerilogFile(
+    new CPU("csrc/fibonacci.hex"),
+    args = Array("--target-dir", "build"),
+    firtoolOpts = Array(
+      "--disable-all-randomization",
+      "--lowering-options=disallowLocalVariables",
+      "--strip-debug-info"
+    )
+  )
 }

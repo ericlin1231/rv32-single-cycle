@@ -9,9 +9,9 @@ import scala.util.Random
 
 import parameters._
 
-class DataRAMTest extends AnyFlatSpec with ChiselScalatestTester {
+class MemoryTest extends AnyFlatSpec with ChiselScalatestTester {
   "DataRAM Test store and read word with random address" should "pass" in {
-    test(new DataRAM) { c =>
+    test(new Memory) { c =>
       for (_ <- 0 until 100) {
         val wordIndex = Random.nextInt(System.DataMemorySizeInWords - 4)
         val address   = wordIndex * System.WordSize
@@ -19,42 +19,42 @@ class DataRAMTest extends AnyFlatSpec with ChiselScalatestTester {
 
         Random.nextInt(2) match {
           case 0 =>  /* store then read */
-            c.io.bundle.address.poke(address)
-            c.io.bundle.wEn.poke(true.B)
-            c.io.bundle.wData.poke(wData)
+            c.io.MEMPort.address.poke(address)
+            c.io.MEMPort.wEn.poke(true.B)
+            c.io.MEMPort.wData.poke(wData)
             c.io.funct3.poke(InstructionsTypeS.sw)
             c.clock.step()
 
-            c.io.bundle.address.poke(address)
-            c.io.bundle.wEn.poke(false.B)
-            c.io.bundle.rEn.poke(true.B)
+            c.io.MEMPort.address.poke(address)
+            c.io.MEMPort.wEn.poke(false.B)
+            c.io.MEMPort.rEn.poke(true.B)
             c.io.funct3.poke(InstructionsTypeL.lw)
             c.clock.step()
 
-            c.io.bundle.rData.expect(wData)
+            c.io.MEMPort.rData.expect(wData)
 
           case 1 => /* disable store then read */
-            c.io.bundle.address.poke(address)
-            c.io.bundle.wEn.poke(false.B)
-            c.io.bundle.rEn.poke(true.B)
+            c.io.MEMPort.address.poke(address)
+            c.io.MEMPort.wEn.poke(false.B)
+            c.io.MEMPort.rEn.poke(true.B)
             c.io.funct3.poke(InstructionsTypeL.lw)
             c.clock.step()
 
-            val expect = c.io.bundle.rData.peek().litValue
+            val expect = c.io.MEMPort.rData.peek().litValue
 
-            c.io.bundle.address.poke(address)
-            c.io.bundle.wEn.poke(false.B)
-            c.io.bundle.wData.poke(wData)
+            c.io.MEMPort.address.poke(address)
+            c.io.MEMPort.wEn.poke(false.B)
+            c.io.MEMPort.wData.poke(wData)
             c.io.funct3.poke(InstructionsTypeS.sw)
             c.clock.step()
 
-            c.io.bundle.address.poke(address)
-            c.io.bundle.wEn.poke(false.B)
-            c.io.bundle.rEn.poke(true.B)
+            c.io.MEMPort.address.poke(address)
+            c.io.MEMPort.wEn.poke(false.B)
+            c.io.MEMPort.rEn.poke(true.B)
             c.io.funct3.poke(InstructionsTypeL.lw)
             c.clock.step()
 
-            c.io.bundle.rData.expect(expect.U)
+            c.io.MEMPort.rData.expect(expect.U)
         }
       }
     }
