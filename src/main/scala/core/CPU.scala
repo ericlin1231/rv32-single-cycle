@@ -30,8 +30,7 @@ class CPU(filename: String) extends Module {
   IF.io.jump_address_id      := EX.io.if_jump_address
   IF.io.jump_flag_id         := EX.io.if_jump_flag
   IF.io.instruction_valid    := io.instruction_valid
-  IF.io.IROMPort.instruction := IROM.io.IROMPort.instruction
-  IROM.io.IROMPort.address   := IF.io.IROMPort.address
+  IF.io.IROMPort             <> IROM.io.IROMPort
 
   /* Instruction Decoder */
   ID.io.instruction := IF.io.instruction

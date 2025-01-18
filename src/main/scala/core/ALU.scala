@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 
 import parameters.System
-import parameters.ALUFunctions
+import parameters.signals.ALUFunctions
 
 class ALU extends Module {
   val io = IO(new Bundle {

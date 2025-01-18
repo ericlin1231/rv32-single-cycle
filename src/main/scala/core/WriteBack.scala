@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 
 import parameters.System
-import parameters.RegWriteSource
+import parameters.signals.RegWriteSource
 
 class WriteBack extends Module {
   val io = IO(new Bundle() {

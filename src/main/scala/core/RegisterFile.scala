@@ -3,7 +3,7 @@ package core
 import chisel3._
 
 import parameters.System
-import parameters.Registers
+import parameters.signals.Registers
 import bundle.RegisterDebugBundle
 
 class RegisterFile extends Module {

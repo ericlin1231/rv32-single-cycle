@@ -4,7 +4,11 @@ import chisel3._
 import chisel3.util.Cat
 import chisel3.util.MuxLookup
 
-import parameters._
+import parameters.System
+import parameters.signals.Opcode
+import parameters.signals.Funct3TypeB
+import parameters.signals.ALUOp1Source
+import parameters.signals.ALUOp2Source
 
 class Execute extends Module {
   val io = IO(new Bundle {
@@ -39,20 +43,20 @@ class Execute extends Module {
   alu.io.op2  := Mux(io.aluop2_source === ALUOp2Source.Register, io.reg2_data, io.immediate)
 
   io.mem_alu_result := alu.io.result
-  io.if_jump_flag := ((opcode === Instructions.jal)
-                      || (opcode === Instructions.jalr)
-                      || (opcode === InstructionTypes.B) && MuxLookup(funct3, false.B)(
+  io.if_jump_flag := ((opcode === Opcode.jal)
+                      || (opcode === Opcode.jalr)
+                      || (opcode === Opcode.B) && MuxLookup(funct3, false.B)(
                           IndexedSeq(
-                            InstructionsTypeB.beq  -> (io.reg1_data        === io.reg2_data),
-                            InstructionsTypeB.bne  -> (io.reg1_data        =/= io.reg2_data),
-                            InstructionsTypeB.blt  -> (io.reg1_data.asSInt <   io.reg2_data.asSInt),
-                            InstructionsTypeB.bge  -> (io.reg1_data.asSInt >=  io.reg2_data.asSInt),
-                            InstructionsTypeB.bltu -> (io.reg1_data.asUInt <   io.reg2_data.asUInt),
-                            InstructionsTypeB.bgeu -> (io.reg1_data.asUInt >=  io.reg2_data.asUInt)
+                            Funct3TypeB.beq  -> (io.reg1_data        === io.reg2_data),
+                            Funct3TypeB.bne  -> (io.reg1_data        =/= io.reg2_data),
+                            Funct3TypeB.blt  -> (io.reg1_data.asSInt <   io.reg2_data.asSInt),
+                            Funct3TypeB.bge  -> (io.reg1_data.asSInt >=  io.reg2_data.asSInt),
+                            Funct3TypeB.bltu -> (io.reg1_data.asUInt <   io.reg2_data.asUInt),
+                            Funct3TypeB.bgeu -> (io.reg1_data.asUInt >=  io.reg2_data.asUInt)
                           )
                         ))
 
-  io.if_jump_address := io.immediate + Mux(opcode === Instructions.jalr,
+  io.if_jump_address := io.immediate + Mux(opcode === Opcode.jalr,
                                             io.reg1_data,
                                             io.instruction_address)
 }
